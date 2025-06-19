@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Emotion Tree</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom, #a8edea, #fed6e3);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 30px;
+      color: #333;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    h1 {
+      color: #2f4f4f;
+      margin-bottom: 10px;
+    }
+
+    .tree-container {
+      position: relative;
+      width: 200px;
+      height: 300px;
+      margin: 20px 0 30px 0;
+      transition: all 0.5s ease;
+    }
+
+    .trunk {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 30px;
+      height: 100px;
+      background: #8b5a2b;
+      border-radius: 5px;
+      transform: translateX(-50%);
+      transition: height 0.5s ease;
+    }
+
+    .leaves {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle at center, #3cb371, #2e8b57);
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      box-shadow: 0 0 15px 3px #3cb371aa;
+      transform: translateX(-50%) scale(1);
+      transition: transform 0.5s ease, box-shadow 0.5s ease, background 0.5s ease;
+    }
+
+    .wilted .leaves {
+      background: radial-gradient(circle at center, #9e9e9e, #707070);
+      box-shadow: none;
+      filter: grayscale(80%) brightness(70%);
+    }
+
+    .input-area {
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    textarea {
+      width: 100%;
+      height: 80px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 2px solid #3cb371;
+      resize: none;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+
+    button {
+      margin: 10px 10px 0 10px;
+      padding: 10px 25px;
+      border: none;
+      border-radius: 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      color: white;
+      font-weight: 600;
+    }
+
+    button.good {
+      background-color: #3cb371;
+    }
+    button.good:hover {
+      background-color: #2e8b57;
+    }
+
+    button.bad {
+      background-color: #d9534f;
+    }
+    button.bad:hover {
+      background-color: #b23b34;
+    }
+
+    #message {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      min-height: 1.5em;
+      font-weight: 600;
+      color: #2f4f4f;
+      transition: color 0.5s ease;
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>Emotion Tree</h1>
+  <div class="tree-container" id="tree">
+    <div class="trunk"></div>
+    <div class="leaves"></div>
+  </div>
+
+  <div class="input-area">
+    <textarea id="thoughtInput" placeholder="Write your thought here..."></textarea>
+    <br />
+    <button class="good" id="btnGood">Good Thought</button>
+    <button class="bad" id="btnBad">Bad Thought</button>
+  </div>
+
+  <div id="message"></div>
+
+  <script>
+    const tree = document.getElementById('tree');
+    const leaves = tree.querySelector('.leaves');
+    const trunk = tree.querySelector('.trunk');
+    const message = document.getElementById('message');
+    const thoughtInput = document.getElementById('thoughtInput');
+
+    let health = 0;
+    const maxHealth = 10;
+    const minHealth = -5;
+
+    const goodMessages = [
+      "Your tree is blooming! Keep it up!",
+      "Positive thoughts make life beautiful!",
+      "Every good thought is a new leaf growing!",
+      "You are nourishing your soul with good things!"
+    ];
+
+    const badMessages = [
+      "It's okay to feel this way, try to breathe and change your thought.",
+      "Your tree is tired, take care of it gently!",
+      "Even in difficulties, there is room to grow. Don't give up!",
+      "Bad thoughts can wither the tree, but you can turn it around!"
+    ];
+
+    function updateTree() {
+      if (health > maxHealth) health = maxHealth;
+      if (health < minHealth) health = minHealth;
+
+      const trunkHeight = 60 + ((health - minHealth) / (maxHealth - minHealth)) * 80;
+      trunk.style.height = `${trunkHeight}px`;
+
+      const scale = 0.5 + ((health - minHealth) / (maxHealth - minHealth)) * 1.0;
+      leaves.style.transform = `translateX(-50%) scale(${scale})`;
+
+      if (health <= 0) {
+        tree.classList.add('wilted');
+      } else {
+        tree.classList.remove('wilted');
+      }
+    }
+
+    function updateMessage(isGood) {
+      const arr = isGood ? goodMessages : badMessages;
+      const msg = arr[Math.floor(Math.random() * arr.length)];
+      message.textContent = msg;
+      message.style.color = isGood ? '#2f4f4f' : '#8b0000';
+    }
+
+    document.getElementById('btnGood').addEventListener('click', () => {
+      const thought = thoughtInput.value.trim();
+      if (thought.length === 0) {
+        alert('Please write something before submitting.');
+        return;
+      }
+      health++;
+      updateTree();
+      updateMessage(true);
+      thoughtInput.value = '';
+    });
+
+    document.getElementById('btnBad').addEventListener('click', () => {
+      const thought = thoughtInput.value.trim();
+      if (thought.length === 0) {
+        alert('Please write something before submitting.');
+        return;
+      }
+      health--;
+      updateTree();
+      updateMessage(false);
+      thoughtInput.value = '';
+    });
+
+    updateTree();
+  </script>
+
+</body>
+</html>
